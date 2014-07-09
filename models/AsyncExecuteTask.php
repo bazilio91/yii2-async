@@ -38,11 +38,32 @@ class AsyncExecuteTask extends AsyncTask
         }
     }
 
-    public function validateArguments($attribute, $params) {
+    public function validateArguments($attribute, $params)
+    {
         if (!isset(array_flip(get_class_methods($this->class))[$this->method])) {
             $this->addError(
                 $attribute,
-                "Method {$this->method} of class {$this->class} does not exist"
+                "Can't validate attributes for not existing method {$this->method} of class {$this->class}"
+            );
+            return;
+        }
+
+        $refFunc = new \ReflectionMethod($this->class, $this->method);
+        $userArguments = array_keys($this->{$attribute});
+        $missingArguments = [];
+        foreach ($refFunc->getParameters() as $param) {
+            if (!$param->isOptional() && !in_array($param->getName(), $userArguments)) {
+                $missingArguments[] = $param->getName();
+            }
+        }
+
+        if (sizeof($missingArguments)) {
+            $this->addError(
+                $attribute,
+                "Method `{$this->method}` missing required arguments: " . implode(
+                    ', ',
+                    $missingArguments
+                )
             );
         }
     }

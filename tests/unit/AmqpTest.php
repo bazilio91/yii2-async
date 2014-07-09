@@ -19,7 +19,7 @@ class TestException extends \Exception
 
 class BlackHole
 {
-    public function run($param)
+    public static function run($param)
     {
         throw new TestException($param);
     }
@@ -93,5 +93,32 @@ class AmqpTest extends \yii\codeception\TestCase
         }
 
         $this->fail('BlackHole method wasn\'t called.');
+    }
+
+    public function testArgumentsValidation()
+    {
+        $aTask = new AsyncExecuteTask();
+        $aTask->setAttributes(
+            [
+                'class' => '\BlackHole',
+                'method' => 'run',
+                'arguments' => ['fail' => 'through the space']
+            ]
+        );
+
+        $this->assertFalse($aTask->validate());
+
+        $this->assertEquals(
+            $aTask->errors['arguments'][0],
+            "Method `run` missing required arguments: param"
+        );
+
+        try {
+            $this->async->sendTask($aTask);
+        } catch (bazilio\async\Exception $e) {
+            return;
+        }
+
+        $this->fail('Async doesn\'t reject invalid task.');
     }
 }
