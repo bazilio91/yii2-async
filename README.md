@@ -1,4 +1,4 @@
-yii-async
+yii2-async
 =========
 
 Provides translucent api for moving large tasks out of request response

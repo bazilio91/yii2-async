@@ -1,5 +1,5 @@
 {
-    "name": "bazilio/yii-async",
+    "name": "bazilio/yii2-async",
     "description": "Provides translucent api for moving large tasks out of request context",
     "license": "MIT",
     "type": "yii2-extension",
