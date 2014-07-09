@@ -3,10 +3,9 @@ yii-async
 
 Provides translucent api for moving large tasks out of request response
 
-Run tests with:
-~~~
-vendor/bin/codecept run
-~~~
+#####Requirments:
+- php >=5.4
+- [php-amqp](https://github.com/pdezwart/php-amqp)
 
 #####Using with AMQP:
 ######Installing:
@@ -28,3 +27,9 @@ vendor/bin/codecept run
 ######Usage:
 For code exampless look into tests:
 - [AmqpTest](tests/unit/AmqpTest.php)
+
+
+######Runing tests:
+~~~
+vendor/bin/codecept run
+~~~
