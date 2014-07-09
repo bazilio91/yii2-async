@@ -1,8 +1,9 @@
 <?php
-
 use bazilio\async\AsyncComponent;
+use bazilio\async\models\AsyncExecuteTask;
+use bazilio\async\models\AsyncTask;
 
-class TestTask extends \bazilio\async\models\AsyncTask
+class TestTask extends AsyncTask
 {
     public $id;
 
@@ -10,7 +11,18 @@ class TestTask extends \bazilio\async\models\AsyncTask
     {
         return $this->id;
     }
+}
 
+class TestException extends \Exception
+{
+}
+
+class BlackHole
+{
+    public function run($param)
+    {
+        throw new TestException($param);
+    }
 }
 
 class AmqpTest extends \yii\codeception\TestCase
@@ -55,5 +67,31 @@ class AmqpTest extends \yii\codeception\TestCase
         $this->assertTrue($this->async->acknowledgeTask($rTask));
 
         $this->assertFalse($this->async->receiveTask(TestTask::$queueName));
+    }
+
+    public function testAsyncExecuteTask()
+    {
+        $aTask = new AsyncExecuteTask();
+        $aTask->setAttributes(
+            [
+                'class' => '\BlackHole',
+                'method' => 'run',
+                'arguments' => ['param' => 'through the space']
+            ]
+        );
+
+        $this->async->sendTask($aTask);
+
+        $rTask = $this->async->receiveTask($aTask::$queueName);
+        $this->assertInstanceOf('bazilio\async\models\AsyncExecuteTask', $rTask);
+
+        try {
+            $rTask->execute();
+        } catch (TestException $e) {
+            $this->assertEquals($e->getMessage(), 'through the space');
+            return true;
+        }
+
+        $this->fail('BlackHole method wasn\'t called.');
     }
 }

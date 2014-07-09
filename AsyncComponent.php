@@ -34,7 +34,7 @@ class AsyncComponent extends Component
         if ($task->validate()) {
             return $this->transport->send(serialize($task), $task::$queueName);
         } else {
-            throw new Exception(implode(',', $task->errors));
+            throw new Exception(var_export($task->errors, true));
         }
     }
 
