@@ -10,7 +10,7 @@
         }
     ],
     "minimum-stability": "alpha",
-    "keywords": ["yii2", "async", "amqp", "rabbitmq", "tasks"],
+    "keywords": ["yii2", "async", "amqp", "rabbitmq", "tasks", "redis"],
     "require": {
         "php": ">=5.4.0",
         "yiisoft/yii2": "*"
@@ -19,7 +19,8 @@
         "phpunit/phpunit": "3.7.*",
         "yiisoft/yii2-codeception": "*",
         "codeception/codeception": "*",
-        "pdezwart/php-amqp": "dev-master"
+        "pdezwart/php-amqp": "dev-master",
+        "yiisoft/yii2-redis": "*"
     },
     "autoload": {
         "psr-4": {

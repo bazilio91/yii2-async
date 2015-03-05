@@ -6,7 +6,7 @@ return [
         'async' => [
             'class' => 'bazilio\async\AsyncComponent',
             'transportConfig' => [
-                'vhost' => 'test',
+                'vhost' => '/',
                 'exchangeName' => 'test'
             ]
         ]

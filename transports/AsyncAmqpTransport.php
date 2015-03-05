@@ -130,9 +130,11 @@ class AsyncAmqpTransport
     public function receive($queueName)
     {
         $message = $this->getQueue($queueName)->get();
+
         if ($message) {
             $task = unserialize($message->getBody());
             $task->message = $message;
+
             return $task;
         }
 

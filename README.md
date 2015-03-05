@@ -5,16 +5,19 @@ Provides translucent api for moving large tasks out of request response
 
 #####Requirments:
 - php >=5.4
-- [php-amqp](https://github.com/pdezwart/php-amqp)
+- Transports:
+  - [php-amqp](https://github.com/pdezwart/php-amqp)
+  - [yii2-redis](https://github.com/yiisoft/yii2-redis)
 
 #####Using with AMQP:
-######Installing:
+`php composer.phar require pdezwart/php-amqp:dev-master`
+
 ```php
 'components' => [
     'async' => [
         'class' => 'bazilio\async\AsyncComponent',
+        'transportClass' => 'bazilio\async\transports\AsyncAmqpTransport',
         'transportConfig' => [
-            'transportClass' => 'bazilio\async\transports\AsyncAmqpTransport'
             'host' => 'localhost',
             'login' => 'guest',
             'password' => 'guest',
@@ -24,9 +27,34 @@ Provides translucent api for moving large tasks out of request response
     ]
 ]
 ```
-######Usage:
+
+
+#####Using with Redis:
+`php composer.phar require yiisoft/yii2-redis:*`
+
+```php
+'components' => [
+    'redis' => [
+        'class' => 'yii\redis\Connection',
+        'hostname' => 'localhost',
+        'port' => 6379,
+        'database' => 0,
+    ],
+    'async' => [
+        'class' => 'bazilio\async\AsyncComponent',
+        'transportClass' => 'bazilio\async\transports\AsyncRedisTransport',
+        'transportConfig' => [
+            'connection' => 'redis',
+        ]
+    ]
+]
+```
+
+
+
+#####Usage:
 For code exampless look into tests:
-- [AmqpTest](tests/unit/AmqpTest.php)
+- [BaseTestClass](tests/unit/BaseTestClass.php)
 
 
 ######Runing tests:

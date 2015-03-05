@@ -30,6 +30,11 @@ class AsyncExecuteTask extends AsyncTask
 
     public function validateMethod($attribute, $params)
     {
+        if (!class_exists($this->class)) {
+            $this->addError($attribute, "Class {$this->$attribute} does not exist");
+            return;
+        }
+
         if (!isset(array_flip(get_class_methods($this->class))[$this->$attribute])) {
             $this->addError(
                 $attribute,
@@ -40,6 +45,11 @@ class AsyncExecuteTask extends AsyncTask
 
     public function validateArguments($attribute, $params)
     {
+        if (!class_exists($this->class)) {
+            $this->addError($attribute, "Class {$this->$attribute} does not exist");
+            return;
+        }
+
         if (!isset(array_flip(get_class_methods($this->class))[$this->method])) {
             $this->addError(
                 $attribute,
