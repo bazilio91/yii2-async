@@ -21,9 +21,9 @@ class AsyncRedisTransport
         $this->connection = \Yii::$app->{$transportConfig['connection']};
     }
 
-    private static function getQueueKey($queueName, $progress = false)
+    public static function getQueueKey($queueName, $progress = false)
     {
-        return "queue:$queueName";
+        return "queue:$queueName" . ($progress ? ':progress' : null);
     }
 
     /**
@@ -78,6 +78,7 @@ class AsyncRedisTransport
      */
     public function purge($queueName)
     {
-        return $this->connection->executeCommand('DEL', [self::getQueueKey($queueName)]) === '1';
+        $this->connection->executeCommand('DEL', [self::getQueueKey($queueName)]);
+        return true;
     }
 } 

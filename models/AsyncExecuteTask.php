@@ -6,6 +6,11 @@ namespace bazilio\async\models;
  */
 class AsyncExecuteTask extends AsyncTask
 {
+    function __sleep()
+    {
+        return $this->attributeNames();
+    }
+
     public $class;
     public $method;
     public $arguments = [];

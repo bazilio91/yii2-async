@@ -47,10 +47,13 @@ class BaseTestClass extends \yii\codeception\TestCase
         $task = new TestTask();
         $this->async->sendTask($task);
 
-        $this->assertEquals(TestTask::className(), get_class($this->async->receiveTask(TestTask::$queueName)));
+        $task = $this->async->receiveTask(TestTask::$queueName);
+        $this->assertEquals(TestTask::className(), get_class($task));
 
         $this->assertTrue($this->async->purge(TestTask::$queueName));
         $this->assertFalse($this->async->receiveTask(TestTask::$queueName));
+
+        $this->assertTrue($this->async->acknowledgeTask($task));
     }
 
     public function testLifeCycle()
@@ -91,6 +94,7 @@ class BaseTestClass extends \yii\codeception\TestCase
             $rTask->execute();
         } catch (TestException $e) {
             $this->assertEquals($e->getMessage(), 'through the space');
+            $this->assertTrue($this->async->acknowledgeTask($rTask));
             return true;
         }
 
