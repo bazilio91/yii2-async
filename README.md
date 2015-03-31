@@ -3,6 +3,8 @@ yii2-async
 
 Provides translucent api for moving large tasks out of request response
 
+Install: `php composer.phar require bazilio/yii2-async:dev-master`
+
 #####Requirments:
 - php >=5.4
 - Transports:
