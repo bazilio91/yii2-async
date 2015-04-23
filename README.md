@@ -55,7 +55,7 @@ Install: `php composer.phar require bazilio/yii2-async:dev-master`
 
 
 #####Usage:
-For code exampless look into tests:
+For code examples look into tests:
 - [BaseTestClass](tests/unit/BaseTestClass.php)
 
 
