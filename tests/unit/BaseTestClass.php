@@ -25,6 +25,16 @@ class BlackHole
     {
         throw new TestException($param);
     }
+
+    public static function hintArray(array $array)
+    {
+
+    }
+
+    public static function hintClass(TestTask $param)
+    {
+
+    }
 }
 
 class BaseTestClass extends \yii\codeception\TestCase
@@ -74,7 +84,7 @@ class BaseTestClass extends \yii\codeception\TestCase
         $this->assertFalse($this->async->receiveTask(TestTask::$queueName));
     }
 
-    public function testAsyncExecuteTask()
+    public function testAsyncExecuteTaskAgainstClass()
     {
         $aTask = new AsyncExecuteTask();
         $aTask->setAttributes(
@@ -101,7 +111,48 @@ class BaseTestClass extends \yii\codeception\TestCase
         $this->fail('BlackHole method wasn\'t called.');
     }
 
-    public function testArgumentsValidation()
+    public function testAsyncExecuteTaskAgainstInstance()
+    {
+        $instance = new TestTask(['id' => 1]);
+
+        $aTask = new AsyncExecuteTask();
+        $aTask->setAttributes(
+            [
+                'instance' => $instance,
+                'method' => 'execute',
+            ]
+        );
+
+        $this->async->sendTask($aTask);
+
+        $rTask = $this->async->receiveTask($aTask::$queueName);
+        $this->assertInstanceOf('bazilio\async\models\AsyncExecuteTask', $rTask);
+
+
+        $this->assertEquals(1, $rTask->execute());
+    }
+
+    public function testArgumentsTypeHintingArrayValidation() {
+        $this->markTestSkipped('Scalar type hint reflection is not available yet.');
+    }
+
+    public function testArgumentsTypeHintingClassValidation() {
+        $aTask = new AsyncExecuteTask();
+        $aTask->setAttributes(
+            [
+                'class' => 'bazilio\async\tests\unit\BlackHole',
+                'method' => 'hintClass',
+                'arguments' => ['param' => 0]
+            ]
+        );
+
+        $this->assertFalse($aTask->validate());
+        $this->assertEquals(
+            $aTask->errors['arguments'][0],
+            'Method `hintClass` param `param` expects type `bazilio\async\tests\unit\TestTask` but got integer'
+        );
+    }
+    public function testMissingArgumentsValidation()
     {
         $aTask = new AsyncExecuteTask();
         $aTask->setAttributes(
