@@ -111,7 +111,9 @@ class AsyncAmqpTransport
      */
     public function send($text, $queueName)
     {
+        // create queue and exchange (if not exist)
         $this->getExchange();
+        $this->getQueue($queueName);
 
         $this->exchange->setName('amq.direct');
         $attributes = ['message_id' => uniqid()];

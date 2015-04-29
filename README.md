@@ -1,5 +1,6 @@
 yii2-async
 =========
+[![Build Status](https://travis-ci.org/bazilio91/yii2-async.svg?branch=master)](https://travis-ci.org/bazilio91/yii2-async)
 
 Provides translucent api for moving large tasks out of request response
 
