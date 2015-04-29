@@ -1,3 +1,7 @@
+0.0.5
+=====
+- [Fix first message send in AMQP provider + travis ci](https://github.com/bazilio91/yii2-async/commit/961fc05bf4776509074c062f944124fe090e1b6f)
+
 0.0.4
 =====
 - [ExecuteAsyncTask instance support & arguments type hinting](https://github.com/bazilio91/yii2-async/commit/c20494322dae6ac588690ba7479cdc10fcc8ee2e)
