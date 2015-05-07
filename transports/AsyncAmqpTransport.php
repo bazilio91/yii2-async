@@ -3,6 +3,7 @@ namespace bazilio\async\transports;
 
 use bazilio\async\models\AsyncTask;
 use bazilio\async\transports\Exception;
+use yii\base\InvalidCallException;
 
 class AsyncAmqpTransport
 {
@@ -78,7 +79,7 @@ class AsyncAmqpTransport
     public function getQueue($queueName)
     {
 
-        if (!$this->queues[$queueName]) {
+        if (empty($this->queues[$queueName])) {
             $queue = new \AMQPQueue($this->getChannel());
             $queue->setName($queueName);
             $queue->setFlags(AMQP_DURABLE);
@@ -143,6 +144,32 @@ class AsyncAmqpTransport
         return false;
     }
 
+    /**
+     * @param $queueName
+     * @return AsyncTask
+     * @throws \Exception
+     * @throws \bazilio\async\transports\Exception
+     */
+    public function waitAndReceive($queueName)
+    {
+        throw new InvalidCallException('Method not implemented');
+        // can't get this shit work
+        $this->getChannel()->setPrefetchCount(0);
+        $task = $this->receive($queueName);
+        if (!$task) {
+            // subscribe to queue events
+            $this->getQueue($queueName)->consume(
+                function ($message, $queue) use ($task) {
+                    $task = unserialize($message->getBody());
+                    $task->message = $message;
+
+                    return $task;
+                }
+            );
+        }
+
+        return $task;
+    }
 
     /**
      * @param AsyncTask $task

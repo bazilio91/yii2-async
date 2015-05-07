@@ -50,7 +50,25 @@ class BaseTestClass extends \yii\codeception\TestCase
         parent::setUp();
 
         $this->async = \Yii::$app->async;
+
+        // cleanup
+        $this->async->purge(TestTask::$queueName);
+        if ($this->async->receiveTask('wrong')) {
+            $this->async->purge('wrong');
+        }
     }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        // cleanup
+        $this->async->purge(TestTask::$queueName);
+        if ($this->async->receiveTask('wrong')) {
+            $this->async->purge('wrong');
+        }
+    }
+
 
     public function testPurge()
     {
@@ -105,7 +123,7 @@ class BaseTestClass extends \yii\codeception\TestCase
         } catch (TestException $e) {
             $this->assertEquals($e->getMessage(), 'through the space');
             $this->assertTrue($this->async->acknowledgeTask($rTask));
-            return true;
+            return;
         }
 
         $this->fail('BlackHole method wasn\'t called.');
@@ -132,11 +150,13 @@ class BaseTestClass extends \yii\codeception\TestCase
         $this->assertEquals(1, $rTask->execute());
     }
 
-    public function testArgumentsTypeHintingArrayValidation() {
+    public function testArgumentsTypeHintingArrayValidation()
+    {
         $this->markTestSkipped('Scalar type hint reflection is not available yet.');
     }
 
-    public function testArgumentsTypeHintingClassValidation() {
+    public function testArgumentsTypeHintingClassValidation()
+    {
         $aTask = new AsyncExecuteTask();
         $aTask->setAttributes(
             [
@@ -152,6 +172,7 @@ class BaseTestClass extends \yii\codeception\TestCase
             'Method `hintClass` param `param` expects type `bazilio\async\tests\unit\TestTask` but got integer'
         );
     }
+
     public function testMissingArgumentsValidation()
     {
         $aTask = new AsyncExecuteTask();
@@ -177,5 +198,34 @@ class BaseTestClass extends \yii\codeception\TestCase
         }
 
         $this->fail('Async doesn\'t reject invalid task.');
+    }
+
+    public function testSubscribe()
+    {
+        if (get_called_class() == 'bazilio\async\tests\unit\AmqpTest') {
+            $this->markTestSkipped('No support for AMQP yet');
+            return;
+        }
+
+        $manager = new \Spork\ProcessManager();
+
+        $task = new TestTask();
+        $task->id = 1;
+
+
+        $fork = $manager->fork(
+            function () use ($task) {
+                return \Yii::$app->asyncFork->receiveTask($task::$queueName, true);
+            }
+        );
+
+        \Yii::$app->async->sendTask($task);
+
+        $fork->then(
+            function (\Spork\Fork $fork) {
+                $task = $fork->getResult();
+                $this->assertEquals(1, $task->execute());
+            }
+        );
     }
 }

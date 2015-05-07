@@ -16,9 +16,9 @@ class AsyncRedisTransport
      */
     protected $connection;
 
-    function __construct($transportConfig)
+    function __construct(Array $connectionConfig)
     {
-        $this->connection = \Yii::$app->{$transportConfig['connection']};
+        $this->connection = \Yii::$app->{$connectionConfig['connection']};
     }
 
     public static function getQueueKey($queueName, $progress = false)
@@ -33,7 +33,9 @@ class AsyncRedisTransport
      */
     public function send($text, $queueName)
     {
-        return $this->connection->executeCommand('RPUSH', [self::getQueueKey($queueName), $text]);
+        $return = $this->connection->executeCommand('RPUSH', [self::getQueueKey($queueName), $text]);
+        $this->connection->executeCommand('PUBLISH', [self::getQueueKey($queueName), 'new']);
+        return $return;
     }
 
     /**
@@ -59,6 +61,39 @@ class AsyncRedisTransport
         return $task;
     }
 
+    /**
+     * @param $queueName
+     * @return AsyncTask
+     */
+    public function waitAndReceive($queueName)
+    {
+        $task = $this->receive($queueName);
+        if (!$task) {
+            // subscribe to queue events
+            $this->connection->executeCommand('SUBSCRIBE', [self::getQueueKey($queueName)]);
+            while (!$task) {
+                // wait for message
+                $response = $this->connection->parseResponse('');
+                if (is_array($response)) {
+                    if ($response[0] !== 'message') {
+                        continue;
+                    }
+
+                    // unsubscribe to release redis connection context
+                    $this->connection->executeCommand('UNSUBSCRIBE', [self::getQueueKey($queueName)]);
+                    $task = $this->receive($queueName);
+
+                    // if someone else got our task - subscribe again and wait
+                    if (!$task) {
+                        $this->connection->executeCommand('SUBSCRIBE', [self::getQueueKey($queueName)]);
+                    }
+                }
+            }
+        }
+
+        return $task;
+    }
+
 
     /**
      * @param AsyncTask $task
@@ -81,4 +116,15 @@ class AsyncRedisTransport
         $this->connection->executeCommand('DEL', [self::getQueueKey($queueName)]);
         return true;
     }
-} 
+
+    /**
+     * @return bool
+     * @throws Exception
+     */
+    function disconnect()
+    {
+        if ($this->connection) {
+            $this->connection->close();
+        }
+    }
+}

@@ -28,6 +28,13 @@ interface Transport
     public function receive($queueName);
 
     /**
+     * Same as [[receive]] but waits if no tasks in queue
+     * @param $queueName
+     * @return AsyncTask
+     */
+    public function waitAndReceive($queueName);
+
+    /**
      * @param AsyncTask $task
      * @return bool
      */

@@ -16,11 +16,12 @@
         "yiisoft/yii2": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "3.7.*",
+        "phpunit/phpunit": "4.6.*",
         "yiisoft/yii2-codeception": "*",
-        "codeception/codeception": "*",
+        "codeception/codeception": "2.0.*",
         "pdezwart/php-amqp": "dev-master",
-        "yiisoft/yii2-redis": "*"
+        "yiisoft/yii2-redis": "*",
+        "kriswallsmith/spork": "*"
     },
     "autoload": {
         "psr-4": {
