@@ -1,5 +1,7 @@
 <?php
 
+namespace bazilio\async\commands;
+
 use bazilio\async\models\AsyncTask;
 
 class AsyncWorkerCommand extends \yii\console\Controller
