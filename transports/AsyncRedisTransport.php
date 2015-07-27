@@ -33,7 +33,7 @@ class AsyncRedisTransport
      */
     public function send($text, $queueName)
     {
-        $return = $this->connection->executeCommand('RPUSH', [self::getQueueKey($queueName), $text]);
+        $return = $this->connection->executeCommand('LPUSH', [self::getQueueKey($queueName), $text]);
         $this->connection->executeCommand('PUBLISH', [self::getQueueKey($queueName), 'new']);
         return $return;
     }
