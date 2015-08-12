@@ -16,7 +16,7 @@ class AsyncRedisTransport
      */
     protected $connection;
 
-    function __construct(Array $connectionConfig)
+    public function __construct(Array $connectionConfig)
     {
         $this->connection = \Yii::$app->{$connectionConfig['connection']};
     }
@@ -24,6 +24,11 @@ class AsyncRedisTransport
     public static function getQueueKey($queueName, $progress = false)
     {
         return "queue:$queueName" . ($progress ? ':progress' : null);
+    }
+
+    public static function getChannelKey($queueName)
+    {
+        return "channel:$queueName";
     }
 
     /**
@@ -34,7 +39,7 @@ class AsyncRedisTransport
     public function send($text, $queueName)
     {
         $return = $this->connection->executeCommand('LPUSH', [self::getQueueKey($queueName), $text]);
-        $this->connection->executeCommand('PUBLISH', [self::getQueueKey($queueName), 'new']);
+        $this->connection->executeCommand('PUBLISH', [self::getChannelKey($queueName), 'new']);
         return $return;
     }
 
@@ -70,7 +75,7 @@ class AsyncRedisTransport
         $task = $this->receive($queueName);
         if (!$task) {
             // subscribe to queue events
-            $this->connection->executeCommand('SUBSCRIBE', [self::getQueueKey($queueName)]);
+            $this->connection->executeCommand('SUBSCRIBE', [self::getChannelKey($queueName)]);
             while (!$task) {
                 // wait for message
                 $response = $this->connection->parseResponse('');
@@ -80,12 +85,12 @@ class AsyncRedisTransport
                     }
 
                     // unsubscribe to release redis connection context
-                    $this->connection->executeCommand('UNSUBSCRIBE', [self::getQueueKey($queueName)]);
+                    $this->connection->executeCommand('UNSUBSCRIBE', [self::getChannelKey($queueName)]);
                     $task = $this->receive($queueName);
 
                     // if someone else got our task - subscribe again and wait
                     if (!$task) {
-                        $this->connection->executeCommand('SUBSCRIBE', [self::getQueueKey($queueName)]);
+                        $this->connection->executeCommand('SUBSCRIBE', [self::getChannelKey($queueName)]);
                     }
                 }
             }
@@ -121,7 +126,7 @@ class AsyncRedisTransport
      * @return bool
      * @throws Exception
      */
-    function disconnect()
+    public function disconnect()
     {
         if ($this->connection) {
             $this->connection->close();
