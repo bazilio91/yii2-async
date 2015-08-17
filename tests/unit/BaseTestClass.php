@@ -62,10 +62,14 @@ class BaseTestClass extends \yii\codeception\TestCase
     {
         parent::tearDown();
 
-        // cleanup
-        $this->async->purge(TestTask::$queueName);
-        if ($this->async->receiveTask('wrong')) {
-            $this->async->purge('wrong');
+        if (\Yii::$app) {
+            $this->async = \Yii::$app->async;
+
+            // cleanup
+            $this->async->purge(TestTask::$queueName);
+            if ($this->async->receiveTask('wrong')) {
+                $this->async->purge('wrong');
+            }
         }
     }
 
@@ -215,7 +219,7 @@ class BaseTestClass extends \yii\codeception\TestCase
 
         $fork = $manager->fork(
             function () use ($task) {
-                return \Yii::$app->asyncFork->receiveTask($task::$queueName, true);
+                return \Yii::$app->asyncFork->waitAndReceive($task::$queueName);
             }
         );
 
@@ -224,6 +228,7 @@ class BaseTestClass extends \yii\codeception\TestCase
         $fork->then(
             function (\Spork\Fork $fork) {
                 $task = $fork->getResult();
+                $this->assertNotEmpty($task);
                 $this->assertEquals(1, $task->execute());
             }
         );
