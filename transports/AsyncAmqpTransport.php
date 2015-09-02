@@ -128,9 +128,10 @@ class AsyncAmqpTransport
 
     /**
      * @param string $queueName
+     * @param bool $wait Wait for task
      * @return AsyncTask|bool
      */
-    public function receive($queueName)
+    public function receive($queueName, $wait = false)
     {
         $message = $this->getQueue($queueName)->get();
 
@@ -142,33 +143,6 @@ class AsyncAmqpTransport
         }
 
         return false;
-    }
-
-    /**
-     * @param $queueName
-     * @return AsyncTask
-     * @throws \Exception
-     * @throws \bazilio\async\transports\Exception
-     */
-    public function waitAndReceive($queueName)
-    {
-        throw new InvalidCallException('Method not implemented');
-        // can't get this shit work
-        $this->getChannel()->setPrefetchCount(0);
-        $task = $this->receive($queueName);
-        if (!$task) {
-            // subscribe to queue events
-            $this->getQueue($queueName)->consume(
-                function ($message, $queue) use ($task) {
-                    $task = unserialize($message->getBody());
-                    $task->message = $message;
-
-                    return $task;
-                }
-            );
-        }
-
-        return $task;
     }
 
     /**

@@ -40,15 +40,12 @@ class AsyncComponent extends Component
 
     /**
      * @param $queueName
+     * @param bool $wait Wait for task
      * @return AsyncTask|bool
      */
-    public function receiveTask($queueName)
+    public function receiveTask($queueName, $wait = false)
     {
-        return $this->transport->receive($queueName);
-    }
-
-    public function waitAndReceive($queueName) {
-        return $this->transport->waitAndReceive($queueName);
+        return $this->transport->receive($queueName, $wait);
     }
 
     /**

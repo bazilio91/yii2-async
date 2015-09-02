@@ -21,7 +21,7 @@
         "codeception/codeception": "2.0.*",
         "pdezwart/php-amqp": "dev-master",
         "yiisoft/yii2-redis": "*",
-        "kriswallsmith/spork": "*"
+        "kriswallsmith/spork": "dev-master"
     },
     "autoload": {
         "psr-4": {

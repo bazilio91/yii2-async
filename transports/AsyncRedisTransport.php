@@ -39,23 +39,28 @@ class AsyncRedisTransport
     public function send($text, $queueName)
     {
         $return = $this->connection->executeCommand('LPUSH', [self::getQueueKey($queueName), $text]);
-        $this->connection->executeCommand('PUBLISH', [self::getChannelKey($queueName), 'new']);
         return $return;
     }
 
     /**
      * @param string $queueName
+     * @param bool $wait Wait for task
      * @return AsyncTask|bool
+     * @throws Exception
      */
-    public function receive($queueName)
+    public function receive($queueName, $wait = false)
     {
         $message = $this->connection->executeCommand(
-            'RPOPLPUSH',
+            ($wait ? 'BRPOPLPUSH' : 'RPOPLPUSH'),
             [self::getQueueKey($queueName), self::getQueueKey($queueName, true)]
         );
 
         if (!$message) {
             return false;
+        }
+
+        if (!is_string($message)) {
+            throw new Exception('Failed to assert message is a string: ' . var_export($message, true));
         }
 
         /**
@@ -65,40 +70,6 @@ class AsyncRedisTransport
         $task->message = $message;
         return $task;
     }
-
-    /**
-     * @param $queueName
-     * @return AsyncTask
-     */
-    public function waitAndReceive($queueName)
-    {
-        $task = $this->receive($queueName);
-        if (!$task) {
-            // subscribe to queue events
-            $this->connection->executeCommand('SUBSCRIBE', [self::getChannelKey($queueName)]);
-            while (!$task) {
-                // wait for message
-                $response = $this->connection->parseResponse('');
-                if (is_array($response)) {
-                    if ($response[0] !== 'message') {
-                        continue;
-                    }
-
-                    // unsubscribe to release redis connection context
-                    $this->connection->executeCommand('UNSUBSCRIBE', [self::getChannelKey($queueName)]);
-                    $task = $this->receive($queueName);
-
-                    // if someone else got our task - subscribe again and wait
-                    if (!$task) {
-                        $this->connection->executeCommand('SUBSCRIBE', [self::getChannelKey($queueName)]);
-                    }
-                }
-            }
-        }
-
-        return $task;
-    }
-
 
     /**
      * @param AsyncTask $task
