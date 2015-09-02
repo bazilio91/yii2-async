@@ -211,26 +211,11 @@ class BaseTestClass extends \yii\codeception\TestCase
             return;
         }
 
-        $manager = new \Spork\ProcessManager();
-
         $task = new TestTask();
         $task->id = 1;
 
-
-        $fork = $manager->fork(
-            function () use ($task) {
-                return \Yii::$app->asyncFork->waitAndReceive($task::$queueName);
-            }
-        );
-
         \Yii::$app->async->sendTask($task);
 
-        $fork->then(
-            function (\Spork\Fork $fork) {
-                $task = $fork->getResult();
-                $this->assertNotEmpty($task);
-                $this->assertEquals(1, $task->execute());
-            }
-        );
+        $this->assertNotFalse(\Yii::$app->async->receiveTask($task::$queueName, true));
     }
 }

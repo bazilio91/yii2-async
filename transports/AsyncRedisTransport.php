@@ -50,9 +50,13 @@ class AsyncRedisTransport
      */
     public function receive($queueName, $wait = false)
     {
+        $params = [self::getQueueKey($queueName), self::getQueueKey($queueName, true)];
+        if ($wait) {
+            $params[] = 0;
+        }
         $message = $this->connection->executeCommand(
             ($wait ? 'BRPOPLPUSH' : 'RPOPLPUSH'),
-            [self::getQueueKey($queueName), self::getQueueKey($queueName, true)]
+            $params
         );
 
         if (!$message) {
