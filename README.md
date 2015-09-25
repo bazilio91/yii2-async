@@ -56,7 +56,67 @@ Install: `php composer.phar require bazilio/yii2-async:dev-master`
 
 
 #####Usage:
-For code examples look into tests:
+
+#### Create and send:
+Test class example:
+```php
+class DownloadTask extends AsyncTask
+{
+    public $url;
+    public $file;
+    public static $queueName = 'downloads';
+
+    public function execute()
+    {
+        return file_put_contents($this->file, file_get_contents($this->url));
+    }
+}
+
+// create task
+$task = new DownloadTask(['url' => 'http://localhost/', 'file' => '/tmp/localhost.html']);
+\Yii::$app->async->sendTask($task);
+```
+
+Or call external method:
+```php
+$task = new AsyncExecuteTask([
+    'class' => 'common\components\MyDownloaderComponent',
+    'method' => 'download',
+    'arguments' => ['url' => 'http://localhost/', 'file' => '/tmp/localhost.html']
+]);
+
+
+$task::$queueName = 'downloads';
+
+if (YII_ENV !== 'prod') {
+    $task->execute();
+} else {
+    Yii::$app->async->sendTask($task);
+}
+```
+
+#### Execute:
+
+Bash way:
+
+```bash
+# Process and exit on finish
+./yii async-worker/execute downloads
+# Process and wait for new tasks (only redis)
+./yii async-worker/daemon downloads
+```
+
+Code way:
+
+```php
+while ($task = \Yii::$app->async->receiveTask('downloads')) {
+    if ($task->execute()) {
+        \Yii::$app->async->acknowledgeTask($task);
+    }
+}
+```        
+
+For more code examples look into tests:
 - [BaseTestClass](tests/unit/BaseTestClass.php)
 
 
