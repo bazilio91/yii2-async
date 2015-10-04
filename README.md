@@ -99,6 +99,16 @@ if (YII_ENV !== 'prod') {
 
 Bash way:
 
+Fill console config:
+```php
+'controllerMap' => [
+        'async-worker' => [
+            'class' => 'bazilio\async\commands\AsyncWorkerCommand',
+        ],
+    ],
+```
+
+Run:
 ```bash
 # Process and exit on finish
 ./yii async-worker/execute downloads
