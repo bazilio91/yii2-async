@@ -1,9 +1,11 @@
 <?php
 namespace bazilio\async\tests\unit;
 
+use bazilio\async\commands\AsyncWorkerCommand;
 use bazilio\async\Exception;
 use bazilio\async\models\AsyncExecuteTask;
 use bazilio\async\models\AsyncTask;
+use yii\base\Module;
 
 class TestTask extends AsyncTask
 {
@@ -217,5 +219,33 @@ class BaseTestClass extends \yii\codeception\TestCase
         \Yii::$app->async->sendTask($task);
 
         $this->assertNotFalse(\Yii::$app->async->receiveTask($task::$queueName, true));
+    }
+
+    public function testConsoleCommandDaemon() {
+        if (get_called_class() == 'bazilio\async\tests\unit\AmqpTest') {
+            $this->markTestSkipped('No support for AMQP yet');
+            return;
+        }
+
+        $task = new TestTask();
+        \Yii::$app->async->sendTask($task);
+
+        $controller = new AsyncWorkerCommand('id', new Module('id'));
+
+        $this->setExpectedException('yii\db\Exception');
+        $controller->actionDaemon($task::$queueName);
+
+        $this->assertFalse($this->async->receiveTask($task::$queueName));
+    }
+
+    public function testConsoleCommandExecute() {
+        $task = new TestTask();
+        \Yii::$app->async->sendTask($task);
+
+        $controller = new AsyncWorkerCommand('id', new Module('id'));
+
+        $controller->actionExecute($task::$queueName);
+
+        $this->assertFalse($this->async->receiveTask($task::$queueName));
     }
 }

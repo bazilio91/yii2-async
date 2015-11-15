@@ -8,6 +8,8 @@ return [
             'hostname' => 'localhost',
             'port' => 6379,
             'database' => 5,
+            'connectionTimeout' => 1,
+            'dataTimeout' => 1,
         ],
         'async' => [
             'class' => 'bazilio\async\AsyncComponent',

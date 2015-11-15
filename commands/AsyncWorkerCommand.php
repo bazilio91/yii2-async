@@ -24,7 +24,7 @@ class AsyncWorkerCommand extends \yii\console\Controller
     public function actionDaemon($queueName = null)
     {
         /** @var AsyncTask $task */
-        while ($task = \Yii::$app->async->waitAndReceive($queueName ?: AsyncTask::$queueName)) {
+        while ($task = \Yii::$app->async->receiveTask($queueName ?: AsyncTask::$queueName, true)) {
             $task->execute();
             \Yii::$app->async->acknowledgeTask($task);
         }
