@@ -24,9 +24,9 @@ class AsyncWorkerCommand extends \yii\console\Controller
     public function actionDaemon($queueName = null)
     {
         /** @var AsyncTask $task */
-        while ($task = \Yii::$app->asyncAmqp->waitAndReceive($queueName ?: AsyncTask::$queueName)) {
+        while ($task = \Yii::$app->async->waitAndReceive($queueName ?: AsyncTask::$queueName)) {
             $task->execute();
-            \Yii::$app->asyncAmqp->acknowledgeTask($task);
+            \Yii::$app->async->acknowledgeTask($task);
         }
     }
 }
