@@ -12,7 +12,7 @@ interface Transport
      * @return bool
      * @throws Exception
      */
-    function disconnect();
+    public function disconnect();
 
     /**
      * @param string $text

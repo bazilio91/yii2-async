@@ -65,4 +65,12 @@ class AsyncComponent extends Component
     {
         return $this->transport->purge($queueName);
     }
+
+    /**
+     * @return Transport
+     */
+    public function getTransport()
+    {
+        return $this->transport;
+    }
 } 

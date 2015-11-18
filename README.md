@@ -134,3 +134,7 @@ For more code examples look into tests:
 ~~~
 vendor/bin/codecept run
 ~~~
+Or in Docker:
+~~~
+./test.sh
+~~~

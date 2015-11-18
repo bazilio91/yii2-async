@@ -101,6 +101,8 @@ class AsyncAmqpTransport
             throw new Exception('Could not disconnect!');
         }
 
+        $this->connection = null;
+
         return true;
     }
 

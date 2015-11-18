@@ -105,6 +105,8 @@ class AsyncRedisTransport
     {
         if ($this->connection) {
             $this->connection->close();
+
+            $this->connection = null;
         }
     }
 }
