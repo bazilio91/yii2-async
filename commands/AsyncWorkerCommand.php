@@ -3,7 +3,6 @@
 namespace bazilio\async\commands;
 
 use bazilio\async\models\AsyncTask;
-use Spork\ProcessManager;
 
 
 class AsyncWorkerCommand extends \yii\console\Controller
