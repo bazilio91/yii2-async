@@ -42,6 +42,7 @@ Install: `php composer.phar require bazilio/yii2-async:dev-master`
         'hostname' => 'localhost',
         'port' => 6379,
         'database' => 0,
+        'dataTimeout' => -1, // important for daemon and blocking queries
     ],
     'async' => [
         'class' => 'bazilio\async\AsyncComponent',
