@@ -35,11 +35,9 @@ class AsyncWorkerCommand extends \yii\console\Controller
      */
     public function actionDaemon($queueName = null, $count = null)
     {
-        $this->handleSignal();
-
         /** @var AsyncTask $task */
         while ($task = \Yii::$app->async->receiveTask($queueName ?: AsyncTask::$queueName, true)) {
-            $this->checkSignal();
+            $this->handleSignal();
 
             $task::$queueName = $queueName ?: AsyncTask::$queueName;
             $this->processTask($task);
@@ -47,6 +45,9 @@ class AsyncWorkerCommand extends \yii\console\Controller
             if (($count !== null && !--$count) || $this->checkSignal()) {
                 break;
             }
+
+            // we don't want to ignore SIGTERM while waiting for task
+            $this->removeSignalHandler();
         }
     }
 
@@ -66,6 +67,11 @@ class AsyncWorkerCommand extends \yii\console\Controller
                 static::$state = -1;
             }
         );
+    }
+
+    private function removeSignalHandler()
+    {
+        pcntl_signal(SIGTERM, SIG_DFL);
     }
 
     private function checkSignal()
