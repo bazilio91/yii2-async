@@ -8,7 +8,6 @@ use bazilio\async\models\AsyncTask;
 class AsyncWorkerCommand extends \yii\console\Controller
 {
     static $state = 1;
-    protected $child;
 
     /**
      * @param string|null $queueName
