@@ -60,6 +60,10 @@ class AsyncWorkerCommand extends \yii\console\Controller
 
     private function handleSignal()
     {
+        if (!function_exists('pcntl_signal')) {
+            return;
+        }
+
         pcntl_signal(
             SIGTERM,
             function ($signo) {
@@ -71,11 +75,19 @@ class AsyncWorkerCommand extends \yii\console\Controller
 
     private function removeSignalHandler()
     {
+        if (!function_exists('pcntl_signal')) {
+            return;
+        }
+
         pcntl_signal(SIGTERM, SIG_DFL);
     }
 
     private function checkSignal()
     {
+        if (!function_exists('pcntl_signal')) {
+            return false;
+        }
+
         pcntl_signal_dispatch();
         if (AsyncWorkerCommand::$state == -1) {
             return true;
