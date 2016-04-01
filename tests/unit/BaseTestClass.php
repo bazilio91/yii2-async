@@ -222,8 +222,8 @@ class BaseTestClass extends \yii\codeception\TestCase
     }
 
     public function testConsoleCommandDaemon() {
-        if (get_called_class() == 'bazilio\async\tests\unit\AmqpTest') {
-            $this->markTestSkipped('No support for AMQP yet');
+        if (get_called_class() !== 'bazilio\async\tests\unit\RedisTest') {
+            $this->markTestSkipped('No support for this transport yet');
             return;
         }
 

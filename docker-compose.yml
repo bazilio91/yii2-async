@@ -1,0 +1,18 @@
+yii2-async:
+  build: .
+  links:
+    - mysql
+    - redis
+    - rabbitmq
+
+mysql:
+  image: mysql
+  environment:
+    MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    MYSQL_DATABASE: "async-test"
+
+redis:
+  image: redis
+
+rabbitmq:
+  image: rabbitmq

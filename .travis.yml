@@ -19,6 +19,7 @@ matrix:
 services:
   - redis-server
   - rabbitmq
+  - mysql
 
 # faster builds on new travis setup not using sudo
 sudo: false
@@ -37,6 +38,7 @@ install:
   - travis_retry composer install --prefer-dist --no-interaction
 
 before_script:
+  - mysql -e 'create database `async-test`;'
 
 script:
   - vendor/bin/codecept run
