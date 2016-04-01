@@ -13,6 +13,7 @@ Install: `php composer.phar require bazilio/yii2-async:dev-master`
 #####Requirments:
 - php >=5.4
 - Transports:
+  - `yii\db\Connection`
   - [php-amqp](https://github.com/pdezwart/php-amqp)
   - [yii2-redis](https://github.com/yiisoft/yii2-redis)
 

@@ -10,7 +10,7 @@
         }
     ],
     "minimum-stability": "alpha",
-    "keywords": ["yii2", "async", "amqp", "rabbitmq", "tasks", "redis"],
+    "keywords": ["yii2", "async", "amqp", "rabbitmq", "tasks", "redis", "mysql"],
     "require": {
         "php": ">=5.4.0",
         "yiisoft/yii2": "*"
