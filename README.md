@@ -10,14 +10,14 @@ Provides translucent api for moving large tasks out of request response
 
 Install: `php composer.phar require bazilio/yii2-async:dev-master`
 
-#####Requirments:
+##### Requirments:
 - php >=5.4
 - Transports:
   - `yii\db\Connection`
   - [php-amqp](https://github.com/pdezwart/php-amqp)
   - [yii2-redis](https://github.com/yiisoft/yii2-redis)
 
-#####Using with AMQP:
+##### Using with AMQP:
 `php composer.phar require pdezwart/php-amqp:dev-master`
 
 main.php:
@@ -38,7 +38,7 @@ main.php:
 ```
 
 
-#####Using with Redis:
+##### Using with Redis:
 `php composer.phar require yiisoft/yii2-redis:*`
 
 main.php:
@@ -61,7 +61,7 @@ main.php:
 ]
 ```
 
-#####Using with MySQL (probably any sql, but tested only with mysql)
+##### Using with MySQL (probably any sql, but tested only with mysql)
 
 main.php:
 ```php
@@ -88,7 +88,7 @@ Apply migrations:
 ./yii migrate/up --migrationPath=@vendor/bazilio/yii2-async/migrations
 ```
 
-#####Usage:
+##### Usage:
 
 #### Create and send:
 Test class example:
@@ -163,7 +163,7 @@ For more code examples look into tests:
 - [BaseTestClass](tests/unit/BaseTestClass.php)
 
 
-######Runing tests:
+###### Runing tests:
 ~~~
 vendor/bin/codecept run
 ~~~
